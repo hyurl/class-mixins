@@ -7,26 +7,19 @@ standalone from the main class, defining a middle class is just painful. In this
 case, PHP introduces a mechanism called `trait` to solve the problem. And in 
 JavaScript, we have `mixin`.
 
-## Purpose
+## Install
 
-I build this package because although there are a lot implementations on NPM, 
-but they either don't directly support mixing classes or not friendly to use, so
-I decide to build my own.
+```sh
+npm i class-mixins
+```
 
-To implement a mixin is easy, what is not easy is how you pick the properties 
-and methods from the given sources, and from their super classes. So I check out
-the documentation of PHP trait and Python's multi-inheritance, and come up with 
-this package.
-
-## Simple Example
-
-(In TypeScript, JavaScript doesn't support decorators)
+## Example
 
 ```typescript
 import * as mixins from "class-mixins";
 
 class Mixin1 {
-    show(str: string) {
+    show(str) {
         console.log(str);
     }
 }
@@ -129,7 +122,7 @@ class Base {
 }
 
 // In TypeScript, you must declare the interface with the same name as class in 
-// order to pass the type check.
+// order to pass type check.
 interface MyClass extends B, C { }
 class MyClass extends Base {
     get name() { }
@@ -185,7 +178,7 @@ class E {
 class Base { }
 
 class MyClass extends mixins.Mixed(Base, A, B, C, D) {
-    // will pass the type check since the mixins count is four
+    // will pass type check since the mixins count is four
 }
 
 interface Mixed extends A, B, C, D, E { }
