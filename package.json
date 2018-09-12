@@ -15,7 +15,8 @@
     "mix",
     "mixin",
     "class",
-    "extends"
+    "extends",
+    "multi-inheritance"
   ],
   "author": "Ayon Lee <i@hyurl.com>",
   "license": "MIT",
