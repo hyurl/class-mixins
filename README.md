@@ -190,7 +190,7 @@ class MyClass extends mixins.Mixed(Base, A, B, C, D) {
 
 interface Mixed extends A, B, C, D, E { }
 class MyClass2 extends mixins.Mixed<Base, Mixed>(Base, A, B, C, D, E) {
-    // must explicitly dprovide the types
+    // must explicitly provide the types
 }
 
 var mine = new MyClass;
