@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * 
+ * Mixes properties and methods from the given sources to the target class.
  * @param {Function} target 
  */
 function mixin(target) {

@@ -26,5 +26,8 @@
   "devDependencies": {
     "mocha": "^5.2.0",
     "tslib": "^1.9.3"
+  },
+  "engines": {
+    "node": ">=4.0"
   }
 }
