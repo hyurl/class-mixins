@@ -1,5 +1,5 @@
 declare namespace mixins {
-    type Constructor<T> = new (...args) => T;
+    type Constructor<T> = Function & { prototype: T }
 
     /**
      * Mixes properties and methods from the given sources to the target class.
@@ -17,29 +17,42 @@ declare namespace mixins {
     function Mixed<T, A>(
         base: Constructor<T>,
         source1: Constructor<A>
-    ): Constructor<T> & Constructor<A>;
+    ): new (...args: any[]) => T & A;
     function Mixed<T, A, B>(
         base: Constructor<T>,
         source1: Constructor<A>,
         source2: Constructor<B>
-    ): Constructor<T> & Constructor<A> & Constructor<B>;
+    ): new (...args: any[]) => T & A & B;
     function Mixed<T, A, B, C>(
         base: Constructor<T>,
         source1: Constructor<A>,
         source2: Constructor<B>,
         source3: Constructor<C>
-    ): Constructor<T> & Constructor<A> & Constructor<B> & Constructor<C>;
+    ): new (...args: any[]) => T & A & B & C;
     function Mixed<T, A, B, C, D>(
         base: Constructor<T>,
         source1: Constructor<A>,
         source2: Constructor<B>,
         source3: Constructor<C>,
         source4: Constructor<D>
-    ): Constructor<T> & Constructor<A> & Constructor<B> & Constructor<C> & Constructor<D>;
-    function Mixed<T, K>(
+    ): new (...args: any[]) => T & A & B & C & D;
+    function Mixed<T, A, B, C, D, E>(
         base: Constructor<T>,
-        ...sources: Constructor<any>[]
-    ): Constructor<T> & Constructor<K>;
+        source1: Constructor<A>,
+        source2: Constructor<B>,
+        source3: Constructor<C>,
+        source4: Constructor<D>,
+        source5: Constructor<E>
+    ): new (...args: any[]) => T & A & B & C & D & E;
+    function Mixed<T, A, B, C, D, E, F>(
+        base: Constructor<T>,
+        source1: Constructor<A>,
+        source2: Constructor<B>,
+        source3: Constructor<C>,
+        source4: Constructor<D>,
+        source5: Constructor<E>,
+        source6: Constructor<F>
+    ): new (...args: any[]) => T & A & B & C & D & E & F;
 }
 
 export = mixins;
