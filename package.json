@@ -1,6 +1,6 @@
 {
   "name": "class-mixins",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A real mixin tool that works with class hierarchy.",
   "main": "index.js",
   "types": "index.d.ts",

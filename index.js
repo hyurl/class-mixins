@@ -1,22 +1,18 @@
 "use strict";
 
 /**
- * Mixes properties and methods from the given sources to the target class.
- * @param {Function} target 
+ * Mixes properties and methods from the given mixins to the class.
+ * @param {Function} ctor 
+ * @param {(object | Function)[]} mixins
  */
-function mixin(target) {
-    /** @type {any[]} */
-    var sources = Array.prototype.slice.call(arguments, 1);
-
-    for (var i in sources) {
-        var source = sources[i];
-
-        if (typeof source == "object") {
-            mergeIfNotExists(target.prototype, source);
-        } else if (typeof source == "function") {
-            mergeHierarchy(target, source);
+function mixin(ctor, ...mixins) {
+    for (let _mixin of mixins) {
+        if (_mixin && typeof _mixin == "object") {
+            mergeIfNotExists(ctor.prototype, _mixin);
+        } else if (typeof _mixin == "function") {
+            mergeHierarchy(ctor, _mixin);
         } else {
-            throw new TypeError("sources must be either objects or functions");
+            throw new TypeError("A mixin must be either an object or a function");
         }
     }
 }
@@ -24,11 +20,12 @@ exports.mixin = mixin;
 
 /**
  * A decorator used directly on the class.
+ * @param {(object | Function)[]} mixins
+ * @returns {(ctor: Function) => void}
  */
-function mix() {
-    var sources = Array.prototype.slice.call(arguments);
+function mix(...mixins) {
     return function (ctor) {
-        mixin.apply(void 0, [ctor].concat(sources));
+        mixin(ctor, ...mixins);
     }
 }
 exports.mix = mix;
@@ -36,76 +33,73 @@ exports.mix = mix;
 /**
  * Returns an extended class combined all mixin functions.
  * @param {Function} base 
+ * @param {(object | Function)[]} mixins
  */
-function Mixed(base) {
-    var Mixed = class extends base { },
-        sources = Array.prototype.slice.call(arguments, 1);
-    mixin.apply(void 0, [Mixed].concat(sources));
-    return Mixed;
+function Mixed(base, ...mixins) {
+    let ctor = class extends base { };
+    mixin(ctor, ...mixins);
+    return ctor;
 }
 exports.Mixed = Mixed;
 
 /**
- * Merges properties and methods only if they're missing in the target class. 
- * @param {any} target 
- * @param {any} source 
+ * Merges properties and methods only if they're missing in the class. 
+ * @param {object} proto 
+ * @param {object} source 
  * @param {boolean} mergeSuper 
  */
-function mergeIfNotExists(target, source, mergeSuper) {
-    var props = Object.getOwnPropertyNames(source);
+function mergeIfNotExists(proto, source, mergeSuper = false) {
+    let props = Reflect.ownKeys(source);
 
-    for (var i in props) {
-        var prop = props[i];
-
+    for (let prop of props) {
         if (prop == "constructor") {
             continue;
         } else if (mergeSuper) {
             // When merging properties from super classes, the properties in the
-            // target's super classes has the major priority, then the sources 
+            // base super classes has the major priority, then the mixins 
             // and their super classes share the priority from left to right.
-            if (!(prop in target)) {
-                setProp(target, source, prop);
+            if (!(prop in proto)) {
+                setProp(proto, source, prop);
             }
-        } else {
-            if (!target.hasOwnProperty(prop)) {
-                setProp(target, source, prop);
-            }
+        } else if (!proto.hasOwnProperty(prop)) {
+            setProp(proto, source, prop);
         }
     }
 
-    return target;
+    return proto;
 }
 
 /**
- * Sets property for target based on the given source and prop name properly.
- * @param {any} target 
- * @param {any} source 
- * @param {string} prop 
+ * Sets property for prototype based on the given source and prop name properly.
+ * @param {object} proto 
+ * @param {object} source 
+ * @param {string|symbol} prop 
  */
-function setProp(target, source, prop) {
-    var desc = Object.getOwnPropertyDescriptor(source, prop);
+function setProp(proto, source, prop) {
+    let desc = Object.getOwnPropertyDescriptor(source, prop);
+
     if (desc) {
-        Object.defineProperty(target, prop, desc);
+        Object.defineProperty(proto, prop, desc);
     } else {
-        target[prop] = source[prop];
+        proto[prop] = source[prop];
     }
 }
 
 /**
  * Merges properties and methods across the prototype chain.
- * @param {Function} target 
- * @param {Function} source 
+ * @param {Function} ctor 
+ * @param {Function} mixin 
  * @param {boolean} mergeSuper 
  */
-function mergeHierarchy(target, source, mergeSuper) {
-    mergeIfNotExists(target.prototype, source.prototype, mergeSuper);
+function mergeHierarchy(ctor, mixin, mergeSuper = false) {
+    mergeIfNotExists(ctor.prototype, mixin.prototype, mergeSuper);
 
-    var _super = Object.getPrototypeOf(source);
+    let _super = Object.getPrototypeOf(mixin);
 
     // Every user defined class or functions that can be instantiated have their
     // own names, if no name appears, that means the function has traveled to 
     // the root of the hierarchical tree.
     if (_super.name) {
-        mergeHierarchy(target, _super, true);
+        mergeHierarchy(ctor, _super, true);
     }
 }

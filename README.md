@@ -51,11 +51,9 @@ class Main4 extends mixins.Mixed(Base2, Mixin1) {
 
 ## API
 
-### `mixins.mixin(target: Function, ...sources: (object | Function)[])`
+### `mixins.mixin(ctor: Function, ...mixins: (object | Function)[])`
 
-This function mixes the given sources to the target class (function). Normally 
-we would set the sources classes, but it also support an standard object that 
-carries functions.
+This function mixes the given mixins to the given class.
 
 ```javascript
 const mixins = require("class-mixins");
@@ -87,14 +85,14 @@ console.log(MyClass.prototype.echo); // => [Function: echo]
 
 #### Naming Conflict and Priority
 
-When the target class and source classes/objects carry the same properties/
+When the base class and mixins classes/objects carry the same properties/
 methods, the program will follow this rule to apply them:
 
-1. The properties/method defined in the target class are always NO.1.
+1. The properties/method defined in the base class are always NO.1.
 2. If the property/method is inherited from the supper class, then the one from 
-    mixins (must be own property) will overwrite it.
+    mixins (must be own property) will override it.
 3. If the property from a mixin is inherited from its supper class, then the 
-    inherited property in the target class will remain and ignore the mixin's.
+    inherited property in the base class will remain and ignore the mixin's ones.
 4. The program will travel the whole prototype chain of a mixin to copy 
     properties and methods.
 5. The mixins follow the order of Left-To-Right when copying properties and 
@@ -132,27 +130,27 @@ mixins.mixin(MyClass, B, C);
 
 var ins = new MyClass;
 
-(ins instanceof Base) == true;
-(ins instanceof B) == false;
+(ins instanceof Base) === true;
+(ins instanceof B) === false;
 ins.name === A.prototype.name;
 ins.echo === Base.prototype.echo;
 ins.talk === B.prototype.talk;
 ins.show === C.prototype.show;
 ```
 
-### mixins.mix(...sources: (object | Function)[]): (ctor: Function) => void
+### mixins.mix(...mixins: (object | Function)[]): (ctor: Function) => void
 
 This is a decorator designed for TypeScript and Babel.
 
-### mixins.Mixed(base: Function, ...sources: (object | Function)[])
+### mixins.Mixed(base: Function, ...mixins: (object | Function)[])
 
 This function will internally create and return an anonymous class that extends 
-the base class, the mixins will be merged to the middle class instead of binding 
+the base class, the mixins will be merged to the pivot class instead of binding 
 to the base class.
 
-In TypeScript, this function accepts no more than four mixins and you don't have
-to explicitly define the returning type, but if you pass more that four mixins, 
-you must define the generic type manually.
+In TypeScript, this function accepts no more than six mixins in order to get
+auto type hint, but if you pass more that six mixins, you must define the
+generic type manually.
 
 ```typescript
 class A {
@@ -175,17 +173,31 @@ class E {
     // ...
 }
 
-class Base { }
-
-class MyClass extends mixins.Mixed(Base, A, B, C, D) {
-    // will pass type check since the mixins count is four
+class F {
+    // ...
 }
 
-interface Mixed extends A, B, C, D, E { }
-class MyClass2 extends mixins.Mixed<Base, Mixed>(Base, A, B, C, D, E) {
-    // must explicitly provide the types
+class G {
+    // ...
+}
+
+class H {
+    // ...
+}
+
+class Base { }
+
+// will automatically get typed
+class MyClass extends mixins.Mixed(Base, A, B, C, D) {
+    // ...
+}
+
+// must explicitly provide the types
+interface Mixins extends A, B, C, D, E, F, G, H { }
+class MyClass2 extends mixins.Mixed<Base, Mixins>(Base, A, B, C, D, E, F, G, H) {
+    // ...
 }
 
 var mine = new MyClass;
-(mine instanceof Base) == true;
+(mine instanceof Base) === true;
 ```
