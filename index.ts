@@ -122,12 +122,12 @@ export function Mixed<T, M>(
     ...mixins: Constructor<any>[]
 ): new (...args: any[]) => T & M;
 export function Mixed(
-    base: new (...args: any[]) => any,
-    ...mixins: (new (...args: any[]) => any)[]
+    base: Constructor<any>,       // must use Constructor, otherwise it will not
+    ...mixins: Constructor<any>[] // pass compilation in Deno, reason is unknown.
 ) {
-    let ctor = class extends base { };
+    let ctor = class extends (<any>base) { };
     mixin(ctor, ...mixins);
-    return ctor;
+    return ctor as any;
 }
 
 /**
