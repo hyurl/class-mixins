@@ -29,7 +29,8 @@
   },
   "homepage": "https://github.com/hyurl/class-mixins#readme",
   "devDependencies": {
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "tslib": "^2.0.3"
   },
   "engines": {
     "node": ">=4.0"
