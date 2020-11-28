@@ -13,10 +13,20 @@ JavaScript, we have `mixin`.
 npm i class-mixins
 ```
 
+### In Deno
+
+Just import this package directly:
+
+```ts
+import { mix, mixin, Mixed } from "https://deno.land/x/class_mixins/index.ts";
+// Or
+import { mix, mixin, Mixed } from "https://github.com/hyurl/class-mixins/raw/master/index.ts";
+```
+
 ## Example
 
 ```typescript
-import * as mixins from "class-mixins";
+import { mix, mixin, Mixed } from "class-mixins";
 
 class Mixin1 {
     show(str) {
@@ -24,19 +34,19 @@ class Mixin1 {
     }
 }
 
-@mixins.mix(Mixin1)
+@mix(Mixin1)
 class Main1 {
     // the class `Main1` now will have the method `show`
 }
 
 class Main2 { }
-mixins.mixin(Main2, Mixin1); // class `Main1` will also have the method `show`
+mixin(Main2, Mixin1); // class `Main1` will also have the method `show`
 
 class Base1 {
     show() { }
 }
 
-class Main3 extends mixins.Mixed(Base1, Mixin1) {
+class Main3 extends Mixed(Base1, Mixin1) {
     // Main3 will inherit `show` from `Base1`, and ignore the one comes from `Mixin1`
 }
 
@@ -44,19 +54,19 @@ class Base2 {
     display() {}
 }
 
-class Main4 extends mixins.Mixed(Base2, Mixin1) {
+class Main4 extends Mixed(Base2, Mixin1) {
     // Main4 will inherit `display` from `Base1` and mix `show` from `Mixin1`
 }
 ```
 
 ## API
 
-### `mixins.mixin(ctor: Function, ...mixins: (object | Function)[])`
+### `mixin(ctor: Function, ...mixins: (object | Function)[])`
 
 This function mixes the given mixins to the given class.
 
 ```javascript
-const mixins = require("class-mixins");
+import { mixin } from "class-mixins";
 
 class A {
     show(str) { console.log(str) }
@@ -69,10 +79,10 @@ class B {
 class MyClass { }
 
 // Mix both class A and class B into MyClass
-mixins.mixin(MyClass, A, B);
+mixin(MyClass, A, B);
 
 // You can also mix with an object
-mixins.mixin(MyClass, {
+mixin(MyClass, {
     echo(str) {
         return this.show(str);
     }
@@ -126,7 +136,7 @@ class MyClass extends Base {
     get name() { }
 }
 
-mixins.mixin(MyClass, B, C);
+mixin(MyClass, B, C);
 
 var ins = new MyClass;
 
@@ -138,17 +148,17 @@ ins.talk === B.prototype.talk;
 ins.show === C.prototype.show;
 ```
 
-### mixins.mix(...mixins: (object | Function)[]): (ctor: Function) => void
+### mix(...mixins: (object | Function)[]): (ctor: Function) => void
 
 This is a decorator designed for TypeScript and Babel.
 
-### mixins.Mixed(base: Function, ...mixins: (object | Function)[])
+### Mixed(base: Function, ...mixins: (object | Function)[])
 
 This function will internally create and return an anonymous class that extends 
 the base class, the mixins will be merged to the pivot class instead of binding 
 to the base class.
 
-In TypeScript, this function accepts no more than six mixins in order to get
+In TypeScript, this function accepts no more than ten mixins in order to get
 auto type hint, but if you pass more that six mixins, you must define the
 generic type manually.
 
@@ -169,32 +179,18 @@ class D {
     // ...
 }
 
-class E {
-    // ...
-}
-
-class F {
-    // ...
-}
-
-class G {
-    // ...
-}
-
-class H {
-    // ...
-}
+// other classes...
 
 class Base { }
 
 // will automatically get typed
-class MyClass extends mixins.Mixed(Base, A, B, C, D) {
+class MyClass extends Mixed(Base, A, B, C, D) {
     // ...
 }
 
 // must explicitly provide the types
-interface Mixins extends A, B, C, D, E, F, G, H { }
-class MyClass2 extends mixins.Mixed<Base, Mixins>(Base, A, B, C, D, E, F, G, H) {
+interface Mixins extends A, B, C, D, E, F, G, H, I, J, K, L { }
+class MyClass2 extends Mixed<Base, Mixins>(Base, A, B, C, D, E, F, G, H, I, J, K, L) {
     // ...
 }
 
