@@ -40,7 +40,7 @@ class Main1 {
 }
 
 class Main2 { }
-mixin(Main2, Mixin1); // class `Main1` will also have the method `show`
+mixin(Main2, Mixin1); // class `Main2` will also have the method `show`
 
 class Base1 {
     show() { }
